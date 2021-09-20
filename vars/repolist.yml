@@ -1,0 +1,6 @@
+---
+repolist:
+- 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
+- 'http://yum.opennms.org/repofiles/opennms-repo-stable-rhel8.noarch.rpm'
+- 'http://rpms.remirepo.net/enterprise/remi-release-8.rpm'
+- yum-utils

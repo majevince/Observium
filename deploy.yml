@@ -1,0 +1,11 @@
+---
+- hosts: glusternode1
+  become: true
+  roles:
+    - packages
+    - mysql
+    - observium-web
+  vars_files:
+    - vars/repolist.yml
+    - vars/packages.yml
+    - vars/repolist.yml

@@ -1,0 +1,52 @@
+---
+# tasks file for mysql
+- name: ensure mariadb server is enabled and started
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+   
+- name: update mariadb password
+  mysql_user:
+    name: root
+    password: "{{root_db_pw}}"
+    host: "{{item}}"
+    login_password: "{{root_db_pw}}"
+  with_items:
+    - localhost
+
+
+
+- name: grant privileges to root user
+  mysql_user:
+    name: root
+    host: "{{item}}"
+    password: "{{root_db_pw}}"
+    login_password: "{{root_db_pw}}"
+  with_items:
+    - 127.0.0.1
+    - ::1
+
+- name: ensure anonymous users are not in the database
+  mysql_user: 
+    name: '' 
+    host_all: yes
+    login_password: "{{root_db_pw}}"
+    state: absent
+
+- name: create observiumdb
+  mysql_db:
+    name: "{{observium_db}}"
+    login_password: "{{root_db_pw}}"
+    encoding: utf8
+    state: present
+  notify: import database schema
+
+- name: grant all privileges access to observium user
+  mysql_user:
+    name: "{{observium_user}}"
+    password: "{{observium_db_pw}}"
+    login_password: "{{root_db_pw}}"
+    priv: 'observium.*:ALL'
+    state: present
+  notify: restart mariadb

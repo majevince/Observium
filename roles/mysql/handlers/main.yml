@@ -1,0 +1,9 @@
+---
+# handlers file for mysql
+- name: import database schema
+  command: /opt/observium/discovery.php -u {{observium_user}}
+
+- name: restart mariadb
+  systemd:
+    name: mariadb
+    state: restarted

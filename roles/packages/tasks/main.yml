@@ -1,0 +1,37 @@
+---
+# tasks file for packages
+- name: install all neccessary repository
+  dnf:
+    name: "{{repolist}}"
+    state: latest
+    disable_gpg_check: yes
+    enablerepo: php:remi-7.4
+  
+- name: install observium packages     
+  dnf:
+    name: "{{packages}}"
+    state: latest
+
+- name: Set Python3 to be the default Python version
+  alternatives:
+    name: python
+    path: /usr/bin/python3
+
+- name: create directory /opt/observium
+  file:
+    path: /opt/observium
+    state: directory
+    recurse: yes
+
+- name: Download the latest .tar.gz 
+  get_url:
+    url: http://www.observium.org/observium-community-latest.tar.gz
+    dest: /opt/
+
+
+- name: unarchive observium-community-latest.tar.gz
+  unarchive:
+    src: /opt/observium-community-latest.tar.gz
+    dest: /opt
+    remote_src: yes
+

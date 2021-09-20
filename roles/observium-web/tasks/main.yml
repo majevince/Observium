@@ -1,0 +1,66 @@
+---
+# tasks file for observium-web
+- name: ensure selinux is permissive
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: ensure apache is enabled and started
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+ 
+- name: ensure firewall is enabled and started
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: ensure port 80 and port 3306 is opened of incomming traffics
+  firewalld:
+    port: "{{item}}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 80/tcp
+    - 3306/tcp
+
+- name: create config.php file
+  template:
+    src: templates/config.php.j2
+    dest: /opt/observium/config.php
+
+
+- name: create a directory  rrd owned by apache
+  file:
+    path: /opt/observium/rrd
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+
+- name: add a line to config.php to tell Observium
+  lineinfile:
+    path: /usr/sbin/fping
+    line: $config['fping'] = "/sbin/fping";
+            
+
+- name: create observium.conf file
+  template:
+    src: templates/observium.conf.j2
+    dest: /etc/httpd/conf.d/observium.conf 
+  notify: restart apache
+
+
+- name: cretate log direcoty
+  file:
+    path: /opt/observium/logs
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+ 
+- name: create user account
+  command: /opt/observium/adduser.php {{observium_web}}  {{observium_web_pw}} 10

@@ -1,0 +1,9 @@
+---
+# vars file for mysql
+root_db_pw: root_pw123
+observium_user: observium
+observium_db: observium
+observium_db_pw: vince123
+observium_web: admin
+observium_web_pw: vince123
+

@@ -1,0 +1,5 @@
+[monitoring]
+glusternode1
+
+[master]
+glustercontroller

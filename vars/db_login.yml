@@ -1,0 +1,5 @@
+---
+root_db_pw: root_pw123
+icingauser: admin
+icingadb: observium
+icinga_db_pw: vince123

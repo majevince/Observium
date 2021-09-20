@@ -1,0 +1,5 @@
+---
+# vars file for observium-webi
+observium_web: admin
+observium_web_pw: vince123
+
