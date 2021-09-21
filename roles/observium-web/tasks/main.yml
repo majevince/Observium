@@ -64,3 +64,70 @@
  
 - name: create user account
   command: /opt/observium/adduser.php {{observium_web}}  {{observium_web_pw}} 10
+
+- name: create user account
+  command: /opt/observium/adduser.php {{user1}}  {{password1}} 8
+
+- name: ensure cronie is installed
+  dnf:
+    name: cronie
+    state: latest
+
+- name: ensure crond is enabled and started
+  systemd:
+    name: crond
+    state: started
+    enabled: yes
+
+- name: create a directory /etc/cron.d/observium
+  file:
+    path: /etc/cron.d/observium
+    state: directory
+    recurse: yes
+
+
+- name: Run a complete discovery of all devices once every 6 hours
+  cron:
+    minute: "33"
+    hour: "*/6"
+    user: root
+    job: "/opt/observium/discovery.php -h all >> /dev/null 2>&1"
+    cron_file: Discovery_all_devices
+  notify: restart cron
+
+- name: Run automated discovery of newly added devices every 5 minutes
+  cron:
+    minute: "*/5 *"
+    hour: "*"
+    user: root
+    job: "/opt/observium/discovery.php -h new >> /dev/null 2>&1"
+    cron_file: add_devices_every_5_minutes
+  notify: restart cron
+
+- name: Run multithreaded poller wrapper every 5 minutes
+  cron:
+    minute: "*/5 *"
+    hour: "*"
+    user: root
+    job: "/opt/observium/poller-wrapper.py >> /dev/null 2>&1"
+    cron_file: poller_wrapper
+  notify: restart cron
+
+- name: Run housekeeping script daily for syslog, eventlog and alert log
+  cron:
+    minute: "13"
+    hour: "5"
+    user: root
+    job: "oot /opt/observium/housekeeping.php -ysel"
+    cron_file: syslog_eventlog
+  notify: restart cron
+
+
+- name: Run housekeeping script daily for rrds, ports, orphaned entries in the database and performance data
+  cron:
+    minute: "47"
+    hour: "4"
+    user: root
+    job: "/opt/observium/housekeeping.php -yrptb"
+    cron_file: Perfomance_data
+  notify: restart cron

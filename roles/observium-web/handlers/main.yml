@@ -4,3 +4,8 @@
   systemd:
     name: httpd
     state: restarted
+
+- name: restart cron
+  systemd:
+    name: crond
+    state: restarted
